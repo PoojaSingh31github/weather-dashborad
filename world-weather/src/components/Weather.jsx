@@ -120,7 +120,7 @@ const WeatherApp = () => {
                     <tbody className="] bg-gray-900 text-gray-100">
                         {
                             paginatedData.map((items, index) => (
-                                <tr key={index} className="hover:bg-gray-600 cursor-pointer" onClick={() => navigate(`/country/?country=${items.name}`)}>
+                                <tr key={index} className="hover:bg-gray-600 cursor-pointer" onClick={() => navigate("/country", { state: { country: items } })}>
                                     <td className="px-4 py-2 border-b border-gray-700 w-3/5">{items.name}</td>
                                     <td className="px-4 py-2 border-b border-gray-700">{items.capital}</td>
                                     <td className="px-4 py-2 border-b border-gray-700">{items.region}</td>
@@ -134,7 +134,7 @@ const WeatherApp = () => {
                 : <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-4">
                     {
                         paginatedData.map((items, index) => (
-                            <div key={index} className="bg-gray-300 shadow-md m-2 p-3 cursor-pointer rounded-md" onClick={() => navigate(`/country/?country=${items.name}`)}>
+                            <div key={index} className="bg-gray-300 shadow-md m-2 p-3 cursor-pointer rounded-md" onClick={() => navigate(`/country/?country=${items.capital}`)}>
                                 <h2 className="font-bold">{items.name}</h2>
                                 <h2 className="text-16 "> Capital: {items.capital}</h2>
                                 <h2 className="text-16 "> Regoin :{items.region}</h2>

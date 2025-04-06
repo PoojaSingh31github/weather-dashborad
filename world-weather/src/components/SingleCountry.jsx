@@ -1,39 +1,66 @@
 import React, { useEffect, useState } from "react";
-import { CountryData } from "../utils/db";
 import { useLocation } from "react-router-dom";
 const SingleCountry = () => {
+    const [data, setData] = useState({})
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(true);
+
     const location = useLocation();
-    console.log(location)
-    const countryy = location.search.split("=")
-    const query = countryy[1].split("%20").join(" ");
+    const countryy = location.state.country.name
+    console.log(countryy)
 
-    const [filterData, setFilterData] = useState({})
+    const WEATHER_API_KEY = '22e2e1afc162af39ffd26c89a8df26b1';
+    const WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather";
 
-    const handleFilter = (query) => {
-        let data = [...CountryData];
-        const filter = data.filter((items) => items.name == query)
-        console.log(filter)
-        setFilterData(filter)
+
+    const fetehWeather = async () => {
+        try {
+            const url = `${WEATHER_API_URL}?q=${countryy}&appid=${WEATHER_API_KEY}&units=metric`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("something went wrong");
+            const result = await res.json();
+            console.log(result)
+            setData(result);
+        } catch (error) {
+            setError("fail to fetch weather")
+            if (error instanceof Error) {
+                setError("fail to fetch weather", error.message)
+            }
+        } finally {
+            setLoading(false)
+        }
     }
-
     useEffect(() => {
-        handleFilter(query)
-    }, [query])
+        fetehWeather();
+    }, [])
 
 
     return (
         <>
-            {
-                filterData.length > 0 ? <div className="bg-gray-300 shadow-md m-2 p-3 cursor-pointer rounded-md">
-                    <h2 className="font-bold">{filterData[0].name}</h2>
-                    <h2 className="text-16 "> Capital: {filterData[0].capital}</h2>
-                    <h2 className="text-16 "> Regoin :{filterData[0].region}</h2>
-                    <h2 className="text-16 ">Alpha-2 Code:{filterData[0].alpha2Code}</h2>
-                    <h2 className="text-16 ">Alpha3 Code: {filterData[0].alpha3Code}</h2>
-                </div> : <h1>No Weather for {query} country</h1>
+            <div className="flex flex-col justify-center items-center h-screen bg-gray-800">
+                <h1 className="font-medium text-[34px] text-gray-300 py-10" >🌤️ Weather App</h1>
+                <div className="w-[50%] lg:w-[30%] mx-auto shadow-md rounded-2xl p-6 text-center space-y-4 bg-blue-300">
+                    <h2 className="text-2xl font-bold text-gray-800">
+                        {data?.name}, {data?.sys?.country}
+                    </h2>
+                    <p className="text-gray-600 capitalize">{data?.weather?.[0]?.description}</p>
 
-            }
+                    {data?.weather?.[0]?.icon && (
+                        <img
+                            className="mx-auto w-20 h-20"
+                            src={`http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`}
+                            alt="Weather Icon"
+                        />
+                    )}
 
+                    <div className="space-y-2 text-gray-700">
+                        <p>🌡️ <span className="font-medium">{data?.main?.temp}°C</span></p>
+                        <p>💨 <span className="font-medium">{data?.wind?.speed} m/s</span></p>
+                        <p>💧 <span className="font-medium">{data?.main?.humidity}%</span></p>
+                    </div>
+                </div>
+
+            </div>
         </>
     )
 
